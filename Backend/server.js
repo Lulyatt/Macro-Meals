@@ -1,44 +1,109 @@
-// ===============================
-// IMPORTS
-// ===============================
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+
+const requiredEnv = [
+  "MONGO_URI",
+  "SESSION_SECRET",
+  "FATSECRET_CLIENT_ID",
+  "FATSECRET_CLIENT_SECRET"
+];
+const missingEnv = requiredEnv.filter((name) => !process.env[name]);
+if (missingEnv.length) {
+  console.error(`Missing required environment variables: ${missingEnv.join(", ")}`);
+  process.exit(1);
+}
+
 const axios = require("axios");
+const mongoose = require("mongoose");
+
+const authRoutes = require("./routes/auth");
+
+const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
+const passport = require("passport");
+require("./config/passport");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-
-const PORT = process.env.PORT || 5000;
-
+// ===============================
+// DEBUG ENV
+// ===============================
+console.log("ENV TEST:", process.env.MONGO_URI);
+console.log("MONGO_URI RAW:", process.env.MONGO_URI);
 
 // ===============================
-// GLOBAL STATE (CACHE / MEMORY)
+// MONGO DB CONNECT
+// ===============================
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log("MongoDB error:", err));
+
+// ===============================
+// MIDDLEWARE
+// ===============================
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true
+  })
+);
+app.use(express.json());
+
+// ===============================
+// SESSION (MUST BE BEFORE ROUTES)
+// ===============================
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev_secret",
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  })
+);
+
+// ===============================
+// PASSPORT (MUST COME AFTER SESSION)
+// ===============================
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ===============================
+// ROUTES
+// ===============================
+app.use("/auth", authRoutes);
+
+// ===============================
+const PORT = process.env.PORT || 5000;
+
+// ===============================
+// GLOBAL STATE (FatSecret token cache)
 // ===============================
 let accessToken = null;
 let tokenExpiry = 0;
 
-
 // ===============================
-// BASIC ROUTES (HEALTH CHECK)
+// HEALTH CHECK
 // ===============================
 app.get("/", (req, res) => {
   res.json({ message: "Macro Meals API is running" });
 });
 
-
 // ===============================
-// AUTH: FATSECRET TOKEN HANDLER
+// FATSECRET TOKEN HANDLER
 // ===============================
-// Handles OAuth 2.0 client credentials flow
-// Gets + caches access token from FatSecret API
-
 async function getAccessToken() {
   const now = Date.now();
 
-  // reuse token if still valid
   if (accessToken && now < tokenExpiry) {
     return accessToken;
   }
@@ -66,10 +131,9 @@ async function getAccessToken() {
   return accessToken;
 }
 
- // ===============================
- // API ROUTES: FOOD SEARCH
- // ===============================
-
+// ===============================
+// FOOD SEARCH ROUTE
+// ===============================
 app.get("/foods/search", async (req, res) => {
   try {
     const token = await getAccessToken();
@@ -91,11 +155,12 @@ app.get("/foods/search", async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.log("FULL ERROR:");
-  console.log(error.response?.data || error.message);
+    console.log(error.response?.data || error.message);
 
-  res.status(500).json({
-    error: "Food search failed",
-    details: error.response?.data || error.message, });
+    res.status(500).json({
+      error: "Food search failed",
+      details: error.response?.data || error.message,
+    });
   }
 });
 
