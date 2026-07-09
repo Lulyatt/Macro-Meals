@@ -14,6 +14,87 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
+    },
+
+    firstName: {
+      type: String,
+      trim: true
+    },
+
+    lastName: {
+      type: String,
+      trim: true
+    },
+
+    dateOfBirth: {
+      type: Date
+    },
+
+    height: {
+      type: Number
+    },
+
+    heightUnit: {
+      type: String,
+      enum: ["cm", "ft"],
+      default: "cm"
+    },
+
+    weight: {
+      type: Number
+    },
+
+    weightUnit: {
+      type: String,
+      enum: ["kg", "lbs", "st"],
+      default: "kg"
+    },
+
+    activityLevel: {
+      type: String,
+      trim: true
+    },
+
+    goals: [{
+      type: String,
+      trim: true
+    }],
+
+    otherGoal: {
+      type: String,
+      trim: true
+    },
+
+    detailedGoals: [{
+      id: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      text: {
+        type: String,
+        required: true,
+        trim: true
+      }
+    }],
+
+    dietaryRequirements: [{
+      type: String,
+      trim: true
+    }],
+
+    favoriteFoods: {
+      type: String,
+      trim: true
+    },
+
+    targetCalories: {
+      type: Number
+    },
+
+    notes: {
+      type: String,
+      trim: true
     }
   },
   { timestamps: true }

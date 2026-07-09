@@ -3,17 +3,18 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
-const requiredEnv = [
-  "MONGO_URI",
-  "SESSION_SECRET",
-  "FATSECRET_CLIENT_ID",
-  "FATSECRET_CLIENT_SECRET"
-];
+const requiredEnv = [];
 const missingEnv = requiredEnv.filter((name) => !process.env[name]);
 if (missingEnv.length) {
   console.error(`Missing required environment variables: ${missingEnv.join(", ")}`);
-  process.exit(1);
 }
+
+process.env.MONGO_URI ||= "mongodb://127.0.0.1:27017/macro-meals";
+process.env.SESSION_SECRET ||= "dev_secret";
+process.env.USE_MONGO ||= "false";
+
+const fatsecretClientId = process.env.FATSECRET_CLIENT_ID || process.env.FATSECRET_KEY;
+const fatsecretClientSecret = process.env.FATSECRET_CLIENT_SECRET || process.env.FATSECRET_SECRET;
 
 const axios = require("axios");
 const mongoose = require("mongoose");
@@ -36,10 +37,26 @@ console.log("MONGO_URI RAW:", process.env.MONGO_URI);
 // ===============================
 // MONGO DB CONNECT
 // ===============================
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log("MongoDB error:", err));
+const useMongoDb = process.env.USE_MONGO === "true" && Boolean(process.env.MONGO_URI && process.env.MONGO_URI.startsWith("mongodb"));
+
+if (useMongoDb) {
+  mongoose.set("bufferCommands", false);
+  mongoose.set("bufferTimeoutMS", 1000);
+
+  mongoose
+    .connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 1000,
+      socketTimeoutMS: 1000,
+      family: 4
+    })
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => {
+      console.log("MongoDB error:", err.message);
+      console.log("Continuing without MongoDB for local development.");
+    });
+} else {
+  console.log("MongoDB URI not configured; skipping DB connection.");
+}
 
 // ===============================
 // MIDDLEWARE
@@ -55,15 +72,19 @@ app.use(express.json());
 // ===============================
 // SESSION (MUST BE BEFORE ROUTES)
 // ===============================
+const sessionStore = useMongoDb
+  ? new MongoStore({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    })
+  : undefined;
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev_secret",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({
-      mongoUrl: process.env.MONGO_URI,
-      collectionName: "sessions",
-    }),
+    store: sessionStore,
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
@@ -116,8 +137,8 @@ async function getAccessToken() {
     }),
     {
       auth: {
-        username: process.env.FATSECRET_CLIENT_ID,
-        password: process.env.FATSECRET_CLIENT_SECRET,
+        username: fatsecretClientId,
+        password: fatsecretClientSecret,
       },
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

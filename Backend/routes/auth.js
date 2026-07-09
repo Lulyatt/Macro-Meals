@@ -2,6 +2,35 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const User = require("../models/User");
+const {
+  memoryUsers,
+  createMemoryUser,
+  findMemoryUserByEmail,
+  findMemoryUserById,
+  updateMemoryUser
+} = require("../utils/memoryUsers");
+
+function buildUserResponse(user) {
+  return {
+    id: user._id || user.id,
+    email: user.email,
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    dateOfBirth: user.dateOfBirth || null,
+    height: user.height || "",
+    heightUnit: user.heightUnit || "cm",
+    weight: user.weight || "",
+    weightUnit: user.weightUnit || "kg",
+    activityLevel: user.activityLevel || "",
+    goals: user.goals || [],
+    otherGoal: user.otherGoal || "",
+    detailedGoals: Array.isArray(user.detailedGoals) ? user.detailedGoals : [],
+    dietaryRequirements: user.dietaryRequirements || [],
+    favoriteFoods: user.favoriteFoods || "",
+    targetCalories: user.targetCalories || "",
+    notes: user.notes || ""
+  };
+}
 
 //
 // 🟢 REGISTER
@@ -15,13 +44,18 @@ router.post("/register", async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const existingUser = await User.findOne({ email: normalizedEmail });
-    if (existingUser) {
+    const existingUser = await User.findOne({ email: normalizedEmail }).catch(() => null);
+    if (existingUser || findMemoryUserByEmail(normalizedEmail)) {
       return res.status(400).json({ error: "Email already in use" });
     }
 
-    const user = new User({ email: normalizedEmail, password });
-    await user.save();
+    let user;
+    try {
+      user = new User({ email: normalizedEmail, password });
+      await user.save();
+    } catch (err) {
+      user = createMemoryUser({ email: normalizedEmail, password });
+    }
 
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
@@ -42,6 +76,8 @@ router.post("/login", (req, res, next) => {
     return res.status(400).json({ error: "Email and password are required" });
   }
 
+  req.body.email = String(email).toLowerCase().trim();
+
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
     if (!user) {
@@ -53,10 +89,7 @@ router.post("/login", (req, res, next) => {
 
       return res.json({
         message: "Login successful",
-        user: {
-          id: user._id,
-          email: user.email
-        }
+        user: buildUserResponse(user)
       });
     });
   })(req, res, next);
@@ -65,21 +98,73 @@ router.post("/login", (req, res, next) => {
 //
 // 🟣 CURRENT USER (SESSION CHECK)
 //
-router.get("/me", (req, res) => {
+router.get("/me", async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ user: null });
   }
 
+  const userId = req.user._id || req.user.id;
+  const user = await User.findById(userId).catch(() => null) || findMemoryUserById(userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
   res.json({
-    user: {
-      id: req.user._id,
-      email: req.user.email
+    user: buildUserResponse(user)
+  });
+});
+
+router.put("/profile", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Please log in first" });
+  }
+
+  const userId = req.user._id || req.user.id;
+  let user = await User.findById(userId).catch(() => null) || findMemoryUserById(userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const allowedFields = [
+    "firstName",
+    "lastName",
+    "dateOfBirth",
+    "height",
+    "heightUnit",
+    "weight",
+    "weightUnit",
+    "activityLevel",
+    "goals",
+    "otherGoal",
+    "detailedGoals",
+    "dietaryRequirements",
+    "favoriteFoods",
+    "targetCalories",
+    "notes"
+  ];
+
+  allowedFields.forEach((field) => {
+    if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+      user[field] = req.body[field];
     }
+  });
+
+  if (user.save) {
+    await user.save();
+  } else {
+    updateMemoryUser(userId, user);
+  }
+
+  res.json({
+    message: "Profile updated successfully",
+    user: buildUserResponse(user)
   });
 });
 
 //
-// 🔴 LOGOUT (optional but useful)
+// 🔴 LOGOUT
 //
 router.post("/logout", (req, res) => {
   req.logout(() => {
