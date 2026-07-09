@@ -43,6 +43,12 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
+    const trimmedPassword = password.trim();
+    const passwordIsValid = trimmedPassword.length >= 8 && /[0-9]/.test(trimmedPassword) && /[^A-Za-z0-9]/.test(trimmedPassword);
+    if (!passwordIsValid) {
+      return res.status(400).json({ error: "Password must be at least 8 characters long and include a number and a special character." });
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
     const existingUser = await User.findOne({ email: normalizedEmail }).catch(() => null);
     if (existingUser || findMemoryUserByEmail(normalizedEmail)) {

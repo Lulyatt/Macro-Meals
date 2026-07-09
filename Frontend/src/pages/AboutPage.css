@@ -1,0 +1,161 @@
+.aboutPage {
+  padding: 40px 24px 60px;
+  max-width: 1080px;
+  margin: 0 auto;
+  color: var(--text);
+}
+
+.aboutHero {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(255, 255, 255, 0));
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 40px 32px;
+  margin-bottom: 40px;
+}
+
+.aboutHeroIntro {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.aboutHero .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #2563eb;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.aboutHero h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 3vw, 3.5rem);
+  line-height: 1.05;
+  color: var(--text-h);
+}
+
+.aboutHero .subtitle {
+  margin-top: 18px;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.aboutContent {
+  display: grid;
+  gap: 32px;
+}
+
+.aboutSection {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.aboutSectionHeader {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.aboutSectionHeader h2 {
+  margin-bottom: 12px;
+  color: var(--text-h);
+}
+
+.sectionIntro {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.aboutGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.aboutCard {
+  padding: 24px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.04);
+}
+
+.aboutCard h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--text-h);
+}
+
+.aboutCard p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.75;
+}
+
+.highlightSection {
+  background: #f8fafc;
+}
+
+.featureList {
+  display: grid;
+  gap: 16px;
+}
+
+.featureItem {
+  display: grid;
+  gap: 6px;
+  padding: 20px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+
+.featureItem strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--text-h);
+}
+
+.featureItem span {
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+@media (max-width: 860px) {
+  .aboutHero {
+    padding: 30px 22px;
+  }
+
+  .aboutContent {
+    gap: 24px;
+  }
+
+  .aboutSection {
+    padding: 24px;
+  }
+
+  .aboutGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .aboutPage {
+    padding: 28px 16px 40px;
+  }
+
+  .aboutHero {
+    padding: 28px 18px;
+  }
+
+  .aboutHeroIntro {
+    text-align: left;
+  }
+
+  .aboutHero h1 {
+    font-size: 2.2rem;
+  }
+}
