@@ -1,0 +1,196 @@
+.favouritesPage {
+  padding: 28px 24px 40px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.favouritesHeader {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #2563eb;
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+}
+
+.subtitle {
+  color: #4b5563;
+  margin-top: 10px;
+  max-width: 720px;
+}
+
+.savedMealsSection {
+  display: grid;
+  gap: 18px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.sectionTitleRow h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.sectionSubtitle {
+  margin: 6px 0 0;
+  color: #6b7280;
+}
+
+.mealCount {
+  font-weight: 700;
+  color: #111827;
+}
+
+.emptyStateCard {
+  padding: 28px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.savedMealsList {
+  display: grid;
+  gap: 16px;
+}
+
+.mealCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 16px;
+}
+
+.mealCard summary {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.summaryRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.shoppingButton {
+  width: 100%;
+}
+
+.shoppingListSection {
+  margin-top: 30px;
+}
+
+.shoppingListCard {
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.shoppingListCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.shoppingListCard li {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.clearButton {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.deleteButton {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.mealCard summary {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.mealCard summary::-webkit-details-marker {
+  display: none;
+}
+
+.mealCard strong {
+  font-size: 1.05rem;
+}
+
+.mealCard p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.mealTotals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.mealDetails {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mealDetails h3 {
+  margin: 0 0 14px;
+  color: #111827;
+}
+
+.mealDetails ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.mealDetails li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #334155;
+}
+
+@media (max-width: 760px) {
+  .sectionTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mealTotals {
+    justify-content: flex-start;
+  }
+}

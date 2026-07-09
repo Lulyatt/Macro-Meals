@@ -22,31 +22,31 @@ function Navbar() {
           <ul className="navbar-nav ms-auto">
 
             <li className="nav-item">
-              <Link className="nav-link" to="/Home">
+              <Link className="nav-link" to="/home">
                 Home
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/About">
+              <Link className="nav-link" to="/about">
                 About
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/Profile">
+              <Link className="nav-link" to="/profile">
                 Profile
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/Favourites">
+              <Link className="nav-link" to="/favourites">
                 Favourites
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/Search">
+              <Link className="nav-link" to="/search">
                 Search
               </Link>
             </li>
