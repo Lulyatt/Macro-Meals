@@ -1,0 +1,9 @@
+.getStartedBtn {
+  display: flex;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #212529;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}

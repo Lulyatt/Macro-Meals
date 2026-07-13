@@ -1,4 +1,5 @@
 import coverImage from '../assets/cover.png'
+import "./HomePage.css"
 
 function Home() {
   return (
@@ -6,11 +7,12 @@ function Home() {
       <section className="homeHero">
         <img src={coverImage} alt="Macro Meals cover" className="homeCover" />
         <div className="homeIntro">
-          <span className="eyebrow">Eat smarter, track macros</span>
+          <span className="eyebrow">Your Goals, Your Meals, Your Way</span>
           <h1>Welcome to Macro Meals</h1>
-          <p>The customizable app that helps you calculate macros and save meal plans.</p>
+          <p>The customisable app that helps you calculate macros and save meal plans.</p>
           <p className="homeCredit">Created by Luke Ulyatt and Joe Ulyatt</p>
         </div>
+        <a href="/register" className="getStartedBtn">Get Started</a>
       </section>
     </main>
   )
